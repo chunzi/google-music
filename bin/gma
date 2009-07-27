@@ -1,6 +1,5 @@
 #!/usr/bin/perl
 use strict;
-use lib './lib';
 use Google::Music::Album;
 use Path::Class;
 use YAML::Syck;
@@ -28,10 +27,22 @@ map {
 } @{$album->songs};
 $down .= "</ul>";
 
-
-
 # save
-DumpFile( $dir->file('meta.yaml'), $album );
+my $meta;
+$meta->{'google_album_id'} = $album->id;
+$meta->{'album'} = $album->name;
+$meta->{'artist'} = $album->artist;
+$meta->{'year'} = $album->year;
+$meta->{'genre'} = undef;
+$meta->{'songs'} = [
+    map {{
+        'google_song_id' => $_->id, 
+        'track' => $_->track,
+        'title' => $_->title,
+        'filename' => $_->filename,
+    }} @{$album->songs}
+];
+DumpFile( $dir->file('meta.yaml'), $meta );
 
 open (DH, '>', $dir->file('down.html') ) or die $!;
 binmode DH, ':utf8';

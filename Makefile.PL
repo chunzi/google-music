@@ -11,8 +11,8 @@ requires 'Class::Accessor::Fast';
 
 build_requires 'Test::More';
 
-install_script 'bin/gma';
 auto_install;
-
+install_script 'bin/gma';
+resources repository => 'http://github.com/chunzi/google-music';
 WriteAll;
 
