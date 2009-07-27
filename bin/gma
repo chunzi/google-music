@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+use lib '../lib';
 use strict;
 use Google::Music::Album;
 use Path::Class;
@@ -48,6 +49,9 @@ open (DH, '>', $dir->file('down.html') ) or die $!;
 binmode DH, ':utf8';
 print DH $down;
 close DH;
+
+my $cmd = sprintf 'curl %s > %s/cover.jpg', $album->cover, quotemeta $dir;
+`$cmd`;
 
 print "$dir\n";
 

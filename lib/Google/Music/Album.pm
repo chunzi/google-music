@@ -4,7 +4,7 @@ use HTML::Entities;
 use Google::Music::Song;
 
 use base qw/Google::Music Class::Accessor::Fast/;
-__PACKAGE__->mk_accessors(qw/ id name artist year songs /);
+__PACKAGE__->mk_accessors(qw/ id cover name artist year songs /);
 
 sub new_from_url {
     my $class = shift;
@@ -32,6 +32,9 @@ sub parse {
     my $self = shift;
     my $html = $self->fetch( $self->url );
     my ( $table ) = ( $html =~ m{<table id="album_item"(?:.*?)>(.*?)</table>}s );  
+
+    my ( $cover ) = ( $table =~ m{<img(?:.*?)class="thumb-img"(?:.*?)src="http://music\.googleusercontent\.cn/base_media\?q=(.*?)\&amp;}s );
+    $self->cover( $cover );
 
     my ( $name ) = ( $table =~ m{<span class="Title">(.*?)</span>}s );
     $name =~ s/^\W|\W$//g;

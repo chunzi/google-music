@@ -4,5 +4,3 @@ Makefile.PL
 README
 lib/Google/Music.pm
 t/00-load.t
-t/pod-coverage.t
-t/pod.t
