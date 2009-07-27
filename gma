@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+use strict;
+use lib './lib';
+use Google::Music::Album;
+use Path::Class;
+use YAML::Syck;
+binmode STDOUT, ':utf8';
+
+# url
+my $url = shift;
+unless ( $url =~ m{^http://www.google.cn/music/album\?id=([a-z0-9A-Z]*)$} ){ 
+    print "Usage: $0 http://www.google.cn/music/album?id=Bb7711df73ec74363\n";
+    exit;
+}
+
+my $album = Google::Music::Album->new_from_url( $url );
+die "failed new album.\n" unless $album;
+$album->parse;
+
+my $dir = dir( $album->dirname )->absolute;
+-d $dir or $dir->mkpath;
+
+
+# down.html
+my $down = sprintf "<b>$dir</b><ul>";
+map {
+    $down .= sprintf q{<li><a href="%s">%s</a></li>}, $_->psp_url, $_->filename; 
+} @{$album->songs};
+$down .= "</ul>";
+
+
+
+# save
+DumpFile( $dir->file('meta.yaml'), $album );
+
+open (DH, '>', $dir->file('down.html') ) or die $!;
+binmode DH, ':utf8';
+print DH $down;
+close DH;
+
+print "$dir\n";
+
+exit;
+
+__DATA__
+my $cmd;
+map {
+    $cmd .= sprintf "echo downloading %s ...\n", $_->filename;
+    $cmd .= sprintf "curl -L %s > %s\n", quotemeta $_->psp_url, quotemeta $_->filename; 
+} @{$album->songs};
+
+open (CMD, '>', 'get.sh') or die $!;
+binmode CMD, ':utf8';
+print CMD $cmd;
+close CMD;
+
+system('sh', 'get.sh');

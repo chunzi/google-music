@@ -1,7 +1,34 @@
 package Google::Music;
-
-use warnings;
 use strict;
+use warnings;
+
+use LWP::UserAgent;
+
+our $VERSION = '0.01';
+
+sub new {
+    my $class = shift;
+    my $self = bless {}, $class;
+    return $self;
+}
+
+sub fetch {
+    my $self = shift;
+    my $url = shift;
+
+    unless ( $self->{'_ua'} ){
+        my $ua = new LWP::UserAgent;
+        $ua->timeout(10);
+        $ua->agent('perl Google::Music');
+        $self->{'_ua'} = $ua;
+    }
+    my $res = $self->{'_ua'}->get( $url );
+    unless ( $res->is_success ){
+        die sprintf "failed fetch url %s: %s\n", $url, $res->status_line;
+    }
+    return $res->decoded_content;
+}
+
 
 =head1 NAME
 
@@ -10,11 +37,6 @@ Google::Music - The great new Google::Music!
 =head1 VERSION
 
 Version 0.01
-
-=cut
-
-our $VERSION = '0.01';
-
 
 =head1 SYNOPSIS
 
@@ -31,22 +53,6 @@ Perhaps a little code snippet.
 
 A list of functions that can be exported.  You can delete this section
 if you don't export anything, such as for a purely object-oriented module.
-
-=head1 FUNCTIONS
-
-=head2 function1
-
-=cut
-
-sub function1 {
-}
-
-=head2 function2
-
-=cut
-
-sub function2 {
-}
 
 =head1 AUTHOR
 
