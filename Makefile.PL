@@ -7,6 +7,7 @@ license  'perl';
 
 requires 'HTML::Entities';
 requires 'LWP::UserAgent';
+requires 'LWP::Curl';
 requires 'Class::Accessor::Fast';
 
 build_requires 'Test::More';
