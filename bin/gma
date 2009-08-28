@@ -1,34 +1,29 @@
-#!/usr/bin/perl
-use lib '../lib';
+#!/usr/bin/env perl
+use lib '/Users/chunzi/github/google-music/lib';
+#use lib '../lib';
 use strict;
 use Google::Music::Album;
 use Path::Class;
 use YAML::Syck;
 binmode STDOUT, ':utf8';
 
-# url
-my $url = shift;
-unless ( $url =~ m{^http://www.google.cn/music/album\?id=([a-z0-9A-Z]*)$} ){ 
-    print "Usage: $0 http://www.google.cn/music/album?id=Bb7711df73ec74363\n";
-    exit;
-}
+my $which = shift;
+my $album = ( $which =~ /http/ )
+                ? Google::Music::Album->new_from_url( $which )
+                : Google::Music::Album->new( $which );
+die "usage: $0 url|id\n" unless $album;
 
-my $album = Google::Music::Album->new_from_url( $url );
-die "failed new album.\n" unless $album;
+
+printf STDERR "fetching album informations...\n";
 $album->parse;
 
+
 my $dir = dir( $album->dirname )->absolute;
+printf STDERR "creating album dir: %s\n", $dir;
 -d $dir or $dir->mkpath;
 
 
-# down.html
-my $down = sprintf "<b>$dir</b><ul>";
-map {
-    $down .= sprintf q{<li><a href="%s">%s</a></li>}, $_->psp_url, $_->filename; 
-} @{$album->songs};
-$down .= "</ul>";
-
-# save
+printf STDERR "saving meta.yaml file...\n";
 my $meta;
 $meta->{'google_album_id'} = $album->id;
 $meta->{'album'} = $album->name;
@@ -45,28 +40,24 @@ $meta->{'songs'} = [
 ];
 DumpFile( $dir->file('meta.yaml'), $meta );
 
-open (DH, '>', $dir->file('down.html') ) or die $!;
-binmode DH, ':utf8';
-print DH $down;
-close DH;
 
-my $cmd = sprintf 'curl %s > %s/cover.jpg', $album->cover, quotemeta $dir;
-`$cmd`;
+printf STDERR "downloading cover.jpg...\n";
+$album->download_file( $album->cover, $dir->file('cover.jpg') );
 
-print "$dir\n";
+
+foreach my $song ( @{$album->songs} ){
+    my $path = $dir->file( $song->filename );
+    if ( -f $path && -B _ ){
+        my $size = -s $path;
+        my $mb = sprintf "%.1fMB", $size / 1024 / 1024;
+        printf STDERR "exists %6s %s\n", $mb, $path;
+        return;
+    }
+
+    printf STDERR "downloading %s...\n", $path->basename;
+    my $url = $song->download_url;
+    $song->download_file($url, $path);
+}
 
 exit;
 
-__DATA__
-my $cmd;
-map {
-    $cmd .= sprintf "echo downloading %s ...\n", $_->filename;
-    $cmd .= sprintf "curl -L %s > %s\n", quotemeta $_->psp_url, quotemeta $_->filename; 
-} @{$album->songs};
-
-open (CMD, '>', 'get.sh') or die $!;
-binmode CMD, ':utf8';
-print CMD $cmd;
-close CMD;
-
-system('sh', 'get.sh');

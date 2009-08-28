@@ -24,9 +24,16 @@ sub download_url {
     my $html = $self->fetch( $self->url );
 
     my ( $url ) = ( $html =~ m{<a href="(/music/.*?)"}s );
+    unless ( $url ){
+        die "Sorry, google now prompting me enter the captcha code.\n".
+            "Abort now. Try couple minutes later.\n";
+    }
+
+    $url =~ s/\&amp;/\&/g;
     sprintf 'http://www.google.cn%s', $url; 
 }
 
+# the site is down
 sub psp_url {
     my $self = shift;
     sprintf 'http://psp-music.appspot.com/gmusic/mp3?id=S%s', $self->id;
@@ -35,7 +42,7 @@ sub psp_url {
 sub filename {
     my $self = shift;
     my $name = sprintf "%02d %s.mp3", $self->track, $self->title;
-    $name =~ s/\/\*\?/_/g;
+    $name =~ s/[\/\*\?]/_/g;
     $name =~ s/\[/\(/g;
     $name =~ s/\]/\)/g;
     return $name;

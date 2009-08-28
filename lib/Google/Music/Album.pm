@@ -16,6 +16,7 @@ sub new_from_url {
 sub new {
     my $class = shift;
     my $id = shift;
+    $id =~ s/^B//;
     return unless $id =~ /^[a-f0-9]{16}$/;
 
     my $self = bless {}, $class;
@@ -61,6 +62,7 @@ sub parse {
 
         my ( $title ) = ( m{<td class="Title\s+(?:.*?)"><a(?:.*?)>(.*?)</a>}s );
         $title = decode_entities( $title );
+        $title =~ s/<b>\.\.\.<\/b>$//; # remove the tailing ...
         $song->title( $title );
 
         push @songs, $song;
@@ -72,7 +74,7 @@ sub parse {
 
 sub dirname {
     my $self = shift;
-    sprintf '%s - %s', $self->artist, $self->name;
+    sprintf '%s - %s - %s', substr($self->id, 0,3 ), $self->artist, $self->name;
 }
 
 

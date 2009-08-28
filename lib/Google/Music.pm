@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use LWP::UserAgent;
+use LWP::Curl;
 
 our $VERSION = '0.01';
 
@@ -29,6 +30,25 @@ sub fetch {
     return $res->decoded_content;
 }
 
+sub download_file {
+    my $self = shift;
+    my $url = shift;
+    my $path = shift;
+    return unless defined $url and defined $path;
+
+    my $curl = LWP::Curl->new();
+    $curl->agent_alias('Mac Safari');
+    $curl->timeout(86400); # one day, no timeout
+
+    my $data = $curl->get( $url ); 
+
+    open ( F, '>', $path ) or die $!;
+    binmode F;
+    print F $data;
+    close F;
+
+    return -f $path && -B _;
+}
 
 =head1 NAME
 
