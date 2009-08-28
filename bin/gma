@@ -50,8 +50,8 @@ foreach my $song ( @{$album->songs} ){
     if ( -f $path && -B _ ){
         my $size = -s $path;
         my $mb = sprintf "%.1fMB", $size / 1024 / 1024;
-        printf STDERR "exists %6s %s\n", $mb, $path;
-        return;
+        printf STDERR "exists %s (%s)\n", $path->basename, $mb;
+        next;
     }
 
     printf STDERR "downloading %s...\n", $path->basename;
