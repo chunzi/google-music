@@ -5,7 +5,7 @@ use strict;
 use Google::Music::Album;
 use Path::Class;
 use YAML::Syck;
-binmode STDOUT, ':utf8';
+binmode STDERR, ':utf8';
 
 my $which = shift;
 my $album = ( $which =~ /http/ )
