@@ -45,7 +45,7 @@ printf STDERR "downloading cover.jpg...\n";
 $album->download_file( $album->cover, $dir->file('cover.jpg') );
 
 
-foreach my $song ( @{$album->songs} ){
+foreach my $song ( sort { $b->track <=> $a->track } @{$album->songs} ){
     my $path = $dir->file( $song->filename );
     if ( -f $path && -B _ ){
         my $size = -s $path;
