@@ -47,11 +47,13 @@ $album->download_file( $album->cover, $dir->file('cover.jpg') );
 
 foreach my $song ( sort { $b->track <=> $a->track } @{$album->songs} ){
     my $path = $dir->file( $song->filename );
-    if ( -f $path && -B _ ){
+    if ( -f $path ){
         my $size = -s $path;
-        my $mb = sprintf "%.1fMB", $size / 1024 / 1024;
-        printf STDERR "exists %s (%s)\n", $path->basename, $mb;
-        next;
+        if ( $size < 102400 ){ # less than 100KB
+            my $mb = sprintf "%.1fMB", $size / 1024 / 1024;
+            printf STDERR "exists %s (%s)\n", $path->basename, $mb;
+            next;
+        }
     }
 
     printf STDERR "downloading %s...\n", $path->basename;

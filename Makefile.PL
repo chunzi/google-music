@@ -9,6 +9,8 @@ requires 'HTML::Entities';
 requires 'LWP::UserAgent';
 requires 'LWP::Curl';
 requires 'Class::Accessor::Fast';
+requires 'YAML::Syck';
+requires 'Path::Class';
 
 build_requires 'Test::More';
 
