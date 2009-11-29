@@ -1,6 +1,4 @@
 #!/usr/bin/env perl
-use lib '/Users/chunzi/github/google-music/lib';
-#use lib '../lib';
 use strict;
 use Google::Music::Album;
 use Path::Class;
