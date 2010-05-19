@@ -15,7 +15,6 @@ die "usage: $0 url|id\n" unless $album;
 printf STDERR "fetching album informations...\n";
 $album->parse;
 
-
 my $dir = dir( $album->dirname )->absolute;
 printf STDERR "creating album dir: %s\n", $dir;
 -d $dir or $dir->mkpath;

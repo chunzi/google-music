@@ -34,7 +34,7 @@ sub parse {
     my $html = $self->fetch( $self->url );
     my ( $table ) = ( $html =~ m{<table id="album_item"(?:.*?)>(.*?)</table>}s );  
 
-    my ( $cover ) = ( $table =~ m{<img(?:.*?)class="thumb-img"(?:.*?)src="http://music\.googleusercontent\.cn/base_media\?q=(.*?)\&amp;}s );
+    my ( $cover ) = ( $table =~ m{<img(?:.*?)class="thumb-img"(?:.*?) src="(.*?)"}s );
     $self->cover( $cover );
 
     my ( $name ) = ( $table =~ m{<span class="Title">(.*?)</span>}s );
