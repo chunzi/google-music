@@ -1,11 +1,21 @@
 #!/usr/bin/env perl
 use strict;
+use warnings;
+
 use Google::Music::Album;
 use Path::Class;
 use YAML::Syck;
+use IPC::Cmd qw/ can_run /;
 binmode STDERR, ':utf8';
 
 my $which = shift;
+
+# get the url from mac's clipboard
+if ( not defined $which and can_run('pbpaste') ){
+    $which = `pbpaste`;
+    chomp $which;
+}
+
 my $album = ( $which =~ /http/ )
                 ? Google::Music::Album->new_from_url( $which )
                 : Google::Music::Album->new( $which );
