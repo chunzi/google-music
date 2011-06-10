@@ -5,12 +5,13 @@ all_from 'lib/Google/Music.pm';
 author   'chunzi <chunzi@gmail.com>';
 license  'perl';
 
-requires 'HTML::Entities';
-requires 'LWP::UserAgent';
-requires 'LWP::Curl';
 requires 'Class::Accessor::Fast';
-requires 'YAML::Syck';
+requires 'HTML::Entities';
+requires 'IPC::Cmd';
+requires 'LWP::Curl';
+requires 'LWP::UserAgent';
 requires 'Path::Class';
+requires 'YAML::Syck';
 
 build_requires 'Test::More';
 
